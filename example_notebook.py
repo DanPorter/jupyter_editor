@@ -4,7 +4,8 @@ Test logbook code
 
 import jupyter_editor as je
 
-notebook = je.NoteBook(r"C:\Users\grp66007\autoNotebook.ipynb")
+notebook = je.NoteBook(r"C:\Users\dgpor\autoNotebook.ipynb")
+print(notebook)
 
 notebook.append_code("#This is some new code\nimport matplotlib.pyplot as plt\nimport numpy as np\n\n",'imports')
 notebook.save()

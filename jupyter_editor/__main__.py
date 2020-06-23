@@ -23,24 +23,24 @@ For GUI use:
 To Parse a notebook file:
     ipython -m jupyter_editor 'somefile.ipynb'
 
-GitHub Repo: https://github.com/DanPorter/jupyter_editor
-
 By Dan Porter, PhD
 Diamond
 2020
-
-Version 1.1.0
-Last updated: 23/06/20
-
-Version History:
-23/06/20    1.1.0   Version History started
 """
+if __name__ == '__main__':
 
-from .main import NoteBook
-from .tkgui.menu import EditorMenu
+    import sys
+    import jupyter_editor as je
 
-__version__ = "1.1.0"
-__date__ = "23/06/2020"
+    print('\nJupyter Editor version %s, %s\n By Dan Porter, Diamond Light Source Ltd.'%(je.__version__, je.__date__))
+    print('See help(je) for info, or type: je.EditorMenu() to get started!')
 
-def start_gui():
-    EditorMenu()
+
+
+    for arg in sys.argv:
+        if 'ipynb' in arg.lower():
+            print('notebook = je.NoteBook("%s")' % arg)
+            notebook = je.NoteBook(arg)
+            print(notebook)
+        elif 'gui' in arg.lower():
+            je.EditorMenu()

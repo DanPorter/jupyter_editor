@@ -4,6 +4,7 @@ Jupyter file editor
 By Dan Porter
 """
 
+import os
 import json
 
 
@@ -113,9 +114,14 @@ class NoteBook:
         if filename is None:
             self.notebook = create_notebook()
             filename = 'test.ipynb'
-        else:
+        elif os.path.isfile(filename):
             self.load(filename)
+        else:
+            self.notebook = create_notebook()
         self.filename = filename
+
+    def __repr__(self):
+        return "JupyterNotebook Object with %d cells: NoteBook('%s')" % (len(self.notebook['cells']), self.filename)
 
     def load(self, filename=None):
         if filename is None:
@@ -127,13 +133,51 @@ class NoteBook:
             filename = self.filename
         save_nb(filename, self.notebook)
 
+    def addcell(self, cell):
+        """Add cell to end of cells, add empty cell after"""
+        if len(self.notebook['cells']) > 0:
+            lastcell = self.notebook['cells'][-1]
+            if len(lastcell['source']) == 0:
+                # replace last empty cell with new cell
+                self.notebook['cells'][-1] = cell
+            else:
+                # append new cell to end
+                self.notebook['cells'] += [cell]
+        else:
+            # append new cell to end
+            self.notebook['cells'] += [cell]
+
+        # append empty cell to end
+        empty_cell = create_code_cell('')
+        self.notebook['cells'] += [empty_cell]
+
+    def insert(self, index, cell):
+        """Inserts cell after cells[index]"""
+        ncells = len(self.notebook['cells'])
+        if index >= ncells:
+            index = -1
+        self.notebook['cells'].insert(index, cell)
+
+    def search(self, name):
+        """Search notebook for cell called name, return index"""
+        return search_notebook(self.notebook, name)
+
+    def insert_by_name(self, name, cell):
+        """Insert cell after named cell"""
+        idx = self.search(name)
+        if idx:
+            self.insert(idx+1, cell)
+        else:
+            print('cell appended to end')
+            self.addcell(cell)
+
     def append_code(self, code_str, name=None):
         cell = create_code_cell(code_str, name)
-        self.notebook['cells'] += [cell]
+        self.addcell(cell)
 
     def append_markdown(self, code_str, name=None):
         cell = create_markdown_cell(code_str, name)
-        self.notebook['cells'] += [cell]
+        self.addcell(cell)
 
     def cell_source(self, cell_index):
         """Return string source for cell"""
@@ -150,14 +194,12 @@ class NoteBook:
             cell['metadata']['name'] = name
         self.notebook['cells'][cell_index] = cell
 
-    def search(self, name):
-        """Search notebook for cell called name, return index"""
-        return search_notebook(self.notebook, name)
-
     def edit_by_name(self, name, source='', append=True):
         """Edit cell with metaname=name"""
         idx = self.search(name)
-        if idx:
+        if idx is not None:
             self.edit_cell(idx, source, append)
-
+        else:
+            print('Code cell appended to end')
+            self.append_code(source, name)
 
