@@ -32,15 +32,14 @@ if __name__ == '__main__':
     import sys
     import jupyter_editor as je
 
-    print('\nJupyter Editor version %s, %s\n By Dan Porter, Diamond Light Source Ltd.'%(je.__version__, je.__date__))
+    print('\nJupyter Editor version %s, %s\n By Dan Porter, Diamond Light Source Ltd.' % (je.__version__, je.__date__))
     print('See help(je) for info, or type: je.EditorMenu() to get started!')
 
-
-
+    notebook = None
     for arg in sys.argv:
         if 'ipynb' in arg.lower():
             print('notebook = je.NoteBook("%s")' % arg)
             notebook = je.NoteBook(arg)
             print(notebook)
         elif 'gui' in arg.lower():
-            je.EditorMenu()
+            je.EditorMenu(notebook)

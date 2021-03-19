@@ -38,7 +38,7 @@ def string2list(source):
 
 def search_notebook(notebook, name):
     """
-    Search notebook for cell with metadata['name']=name, return cell index
+    Search notebook for cell with metadata['name']=name, return first cell index
     :param notebook: dict: jupyter notebook
     :param name: str: name identifyer to search for, first instance returned
     :return: int: index
@@ -109,6 +109,22 @@ def create_notebook(cells=[]):
 class NoteBook:
     """
     Jupyter notebook class
+    Usage:
+        nb = Notebook('/path/notebook.ipynb')  # opens notebook if it exists, or creates a new one
+        nb = NoteBook()  # creates new notebook called 'test.ipynb'
+        nb.notebook  # underlying dict object containing jupyter cells
+        print(nb)    # displays notebook cells
+        print(nb.all_cells())  # prints source for every cell in notebook
+    Methods:
+        nb.load('file.ipynb')       Load file
+        nb.save()                   Save .ipynb file (previous filename used)
+        nb.save('newfile.ipynb')    Save as
+        nb.append_code('code str')  Add code cell
+        nb.append_markdown('str')   Add markdown cell
+        nb.edit_cell(idx, 'str')    Edit/ append previous cell
+    Methods using named cells:
+        nb.search(name)             returns first index of named cell
+        nb.edit_by_name(name,'str') Edit/ append previous cell using name
     """
     def __init__(self, filename=None):
         if filename is None:
@@ -122,6 +138,16 @@ class NoteBook:
 
     def __repr__(self):
         return "JupyterNotebook Object with %d cells: NoteBook('%s')" % (len(self.notebook['cells']), self.filename)
+
+    def __str__(self):
+        out = 'Notebook(\'%s\')\n' % self.filename
+        for n, cell in enumerate(self.notebook['cells']):
+            name = (cell['metadata']['name'] if 'name' in cell['metadata'].keys() else '')
+            example = (cell['source'][0].strip() if len(cell['source']) > 0 else 'Empty')
+            cell_type = cell['cell_type']
+            cell_len = len(cell['source'])
+            out += '%3d: %10s : name=%10s : %2d lines : %s\n' % (n, cell_type, name, cell_len, example)
+        return out
 
     def load(self, filename=None):
         if filename is None:
@@ -179,9 +205,22 @@ class NoteBook:
         cell = create_markdown_cell(code_str, name)
         self.addcell(cell)
 
-    def cell_source(self, cell_index):
+    def cell_source(self, cell_index=0, name=None):
         """Return string source for cell"""
+        if name is not None:
+            cell_index = self.search(name)
         return ''.join(self.notebook['cells'][cell_index]['source'])
+
+    def all_cells(self):
+        """return str of all cells in notebook"""
+        out = 'Notebook(\'%s\')\n' % self.filename
+        for n, cell in enumerate(self.notebook['cells']):
+            name = (cell['metadata']['name'] if 'name' in cell['metadata'].keys() else '')
+            cell_type = cell['cell_type']
+            cell_len = len(cell['source'])
+            source = ''.join(cell['source'])
+            out += '%3d: %10s : name=%10s : %2d lines \n%s\n' % (n, cell_type, name, cell_len, source)
+        return out
 
     def edit_cell(self, cell_index, source='', append=True, name=None):
         """Replace or append string source in cell"""

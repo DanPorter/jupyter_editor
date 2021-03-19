@@ -15,3 +15,5 @@ print('Cell no: %s'%idx)
 
 notebook.edit_by_name('imports', 'import sys, os\n')
 notebook.save()
+
+print(notebook.all_cells())

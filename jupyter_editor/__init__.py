@@ -29,18 +29,20 @@ By Dan Porter, PhD
 Diamond
 2020
 
-Version 1.1.0
-Last updated: 23/06/20
+Version 1.2.0
+Last updated: 19/03/21
 
 Version History:
 23/06/20    1.1.0   Version History started
+19/03/21    1.2.0   Minor updates, added __str__ to NoteBook
 """
 
 from .main import NoteBook
 from .tkgui.menu import EditorMenu
 
-__version__ = "1.1.0"
-__date__ = "23/06/2020"
+__version__ = "1.2.0"
+__date__ = "19/03/2021"
+
 
 def start_gui():
     EditorMenu()
