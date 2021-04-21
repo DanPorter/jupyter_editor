@@ -74,7 +74,7 @@ class EditorMenu:
 
         var = tk.Label(f_file, text='Notebook file:', font=SF, width=10)
         var.pack(side=tk.LEFT, expand=tk.NO, padx=5)
-        var = tk.Label(f_file, textvariable=self.file, width=40, font=TF)
+        var = tk.Label(f_file, textvariable=self.file, font=TF)
         var.pack(side=tk.LEFT, expand=tk.YES)
         var = tk.Button(f_file, text='Load', font=BF, bg=btn, activebackground=btn_active, command=self.fun_load)
         var.pack(side=tk.LEFT, expand=tk.NO, padx=0)
@@ -126,10 +126,14 @@ class EditorMenu:
         var["menu"].config(bg=opt, bd=0, activebackground=opt_active)
         var.pack(side=tk.LEFT, padx=5)
 
+        var = tk.Button(frm, text='Del', font=BF, bg=btn,
+                        activebackground=btn_active, command=self.fun_delete_cell)
+        var.pack(side=tk.LEFT, expand=tk.NO, padx=5, pady=5)
+
         var = tk.Label(frm, text='Name:', font=SF)
         var.pack(side=tk.LEFT, expand=tk.NO, padx=5)
         var = tk.Entry(frm, textvariable=self.cell_name, font=TF, width=20, bg=ety, fg=ety_txt)
-        var.pack(side=tk.LEFT)
+        var.pack(side=tk.LEFT, padx=(1, 10))
 
         ########################################################
         # Eval box with scroll bar
@@ -240,7 +244,7 @@ class EditorMenu:
             self.notebook.filename = filename
             self.notebook.save(filename)
 
-    def fun_cell_select(self, event):
+    def fun_cell_select(self, event=None):
         """Select cell in listbox"""
         current = self.list.curselection()
         if len(current) == 0:
@@ -285,6 +289,17 @@ class EditorMenu:
             self.notebook.append_markdown(source, name=cell_name)
         self.notebook.save(filename)
         self.fun_listcells()
+
+    def fun_delete_cell(self):
+        """Delete selected cell"""
+        cell_idx = self.current_cell.get()
+        self.notebook.delete(cell_idx)
+        self.fun_listcells()
+        if cell_idx < len(self.notebook.notebook['cells']):
+            self.list.select_set(cell_idx)
+        elif cell_idx-1 >= 0:
+            self.list.select_set(cell_idx-1)
+        self.fun_cell_select()
 
     def on_closing(self):
         """End mainloop on close window"""

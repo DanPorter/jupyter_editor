@@ -28,7 +28,7 @@ def save_nb(filename, notebook):
     """
     with open(filename, 'wt') as fobj:
         json.dump(notebook, fobj)
-    print('Notebook saved')
+    print('Notebook saved as %s' % filename)
 
 
 def string2list(source):
@@ -135,6 +135,7 @@ class NoteBook:
         else:
             self.notebook = create_notebook()
         self.filename = filename
+        self._wastebasket = []  # wastebascket for deleted cells
 
     def __repr__(self):
         return "JupyterNotebook Object with %d cells: NoteBook('%s')" % (len(self.notebook['cells']), self.filename)
@@ -152,11 +153,15 @@ class NoteBook:
     def load(self, filename=None):
         if filename is None:
             filename = self.filename
+        else:
+            self.filename = filename
         self.notebook = load_nb(filename)
 
     def save(self, filename=None):
         if filename is None:
             filename = self.filename
+        else:
+            self.filename = filename
         save_nb(filename, self.notebook)
 
     def addcell(self, cell):
@@ -183,6 +188,16 @@ class NoteBook:
         if index >= ncells:
             index = -1
         self.notebook['cells'].insert(index, cell)
+
+    def delete(self, cell_index):
+        """Remove cell from list"""
+        waste = self.notebook['cells'].pop(cell_index)
+        self._wastebasket += [waste]
+
+    def delete_name(self, name):
+        """Remove cell from list using name"""
+        idx = self.search(name)
+        self.delete(idx)
 
     def search(self, name):
         """Search notebook for cell called name, return index"""
@@ -241,4 +256,21 @@ class NoteBook:
         else:
             print('Code cell appended to end')
             self.append_code(source, name)
+
+    def merge_notebook(self, filename, which_cells=None):
+        """
+        Open another .ipynb notebook and add cells to the end of this one
+        :param filename: str filename.ipynb
+        :param which_cells: slice or None
+        :return: None
+        """
+        if which_cells is None:
+            which_cells = slice(None, None, None)  # [:]
+
+        new_notebook = load_nb(filename)
+        new_cells = new_notebook['cells'][which_cells]
+        if issubclass(type(new_cells), dict):
+            self.addcell(new_cells)
+        else:
+            self.notebook['cells'] += new_cells
 

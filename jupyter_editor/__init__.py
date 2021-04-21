@@ -29,19 +29,20 @@ By Dan Porter, PhD
 Diamond
 2020
 
-Version 1.2.0
-Last updated: 19/03/21
+Version 1.2.1
+Last updated: 21/04/21
 
 Version History:
 23/06/20    1.1.0   Version History started
 19/03/21    1.2.0   Minor updates, added __str__ to NoteBook
+21/04/21    1.3.0   Added merge_notebook('notebook.ipynb'), delete_cell
 """
 
 from .main import NoteBook
 from .tkgui.menu import EditorMenu
 
-__version__ = "1.2.0"
-__date__ = "19/03/2021"
+__version__ = "1.3.0"
+__date__ = "21/04/2021"
 
 
 def start_gui():
